@@ -156,7 +156,13 @@ export async function DELETE(
       return new NextResponse("Unauthorized", { status: 403 });
     }
 
-    const product = await prismadb.product.deleteMany({
+    await prismadb.orderItem.deleteMany({
+      where: {
+        productId: params.productId,
+      },
+    });
+
+    const product = await prismadb.product.delete({
       where: {
         id: params.productId,
       },

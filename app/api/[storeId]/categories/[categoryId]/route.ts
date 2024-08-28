@@ -3,30 +3,33 @@ import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
 
 export async function GET(
-    req: Request,
-    { params }: { params: { categoryId: string } }
-  ) {
-    try {
-      if (!params.categoryId) {
-        return new NextResponse("Category ID is required", { status: 400 });
-      }
-  
-      const category = await prismadb.category.findUnique({
-        where: {
-          id: params.categoryId,
-        },
-      });
-  
-      return NextResponse.json(category);
-    } catch (error) {
-      console.log("[CATEGORY_GET", error);
-      return new NextResponse("Internal error", { status: 500 });
+  req: Request,
+  { params }: { params: { categoryId: string } }
+) {
+  try {
+    if (!params.categoryId) {
+      return new NextResponse("Category ID is required", { status: 400 });
     }
+
+    const category = await prismadb.category.findUnique({
+      where: {
+        id: params.categoryId,
+      },
+      include: {
+        billboard: true,
+      },
+    });
+
+    return NextResponse.json(category);
+  } catch (error) {
+    console.log("[CATEGORY_GET", error);
+    return new NextResponse("Internal error", { status: 500 });
   }
+}
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { storeId: string, categoryId: string } }
+  { params }: { params: { storeId: string; categoryId: string } }
 ) {
   try {
     const { userId } = auth();
@@ -80,7 +83,7 @@ export async function PATCH(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { storeId: string, categoryId: string } }
+  { params }: { params: { storeId: string; categoryId: string } }
 ) {
   try {
     const { userId } = auth();
